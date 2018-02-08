@@ -96,7 +96,6 @@ show_menus() {
 }
 
 read_options(){
-	local choice
 	read -p "[HELK-INSTALLATION-INFO] Enter choice [ 1 - 4] " choice
     if [ $choice = "1" ] || [ $choice = "2" ]; then
         if [ "$systemKernel" == "Linux" ]; then

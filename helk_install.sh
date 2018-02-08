@@ -66,7 +66,6 @@ two(){
 # *********** Building the HELK from local bash script ***************
 three(){
     echo "[HELK-BASH-INSTALLATION-INFO] Installing the HELK from local bash script"
-    read -p '[HELK-BASH-INSTALLATION-INFO] Set IP adress to access Kibana-Spark-Jupiter Notebook: ' KIBANA_IP # For multiple NIC situation, for now just local bash script installation
     cd scripts/
     ./helk_debian_tar_install.sh
     ERROR=$?
@@ -217,6 +216,7 @@ read_options(){
 	esac
 }
 
+read -p '[HELK-BASH-INSTALLATION-INFO] Set IP adress to access Kibana-Spark-Jupiter Notebook: ' KIBANA_IP # For multiple NIC situation, for now just local bash script installation
 # *********** Getting Host IP ***************
 # https://github.com/Invoke-IR/ACE/blob/master/ACE-Docker/start.sh
 if [ $choice = "1" ] || [ $choice = "2" ]; then  # Setting IP for Docker installation
@@ -231,6 +231,7 @@ fi
 # Setting IP for local bash script installation in multiple NIC case
 if [ $choice = "3" ]; then
 host_ip=$KIBANA_IP
+fi
 # *********** Running selected option ***************
 show_menus
 read_options

@@ -7,7 +7,7 @@
 # Author: Roberto Rodriguez (@Cyb3rWard0g)
 # License: BSD 3-Clause
 
-# References: 
+# References:
 # https://github.com/elastic/kibana/issues/3709 (https://github.com/hobti01)
 # https://explainshell.com/explain?cmd=set+-euxo%20pipefail
 # https://github.com/elastic/beats-dashboards/blob/master/load.sh
@@ -16,7 +16,7 @@
 # *********** Setting Variables ***************
 KIBANA="http://localhost:5601"
 TIME_FIELD="@timestamp"
-DEFAULT_INDEX="sysmon-*"
+DEFAULT_INDEX="*"
 DIR=/opt/helk/dashboards
 
 # *********** Setting Index Pattern Array ***************
@@ -28,7 +28,7 @@ until curl -s localhost:5601 -o /dev/null; do
 done
 
 # *********** Creating Kibana index-patterns ***************
-for index in ${!index_patterns[@]}; do 
+for index in ${!index_patterns[@]}; do
     curl -f -XPOST -H "Content-Type: application/json" -H "kbn-xsrf: anything" \
     "$KIBANA/api/saved_objects/index-pattern/${index_patterns[${index}]}" \
     -d"{\"attributes\":{\"title\":\"${index_patterns[${index}]}\",\"timeFieldName\":\"$TIME_FIELD\"}}"
@@ -41,7 +41,7 @@ curl -XPOST -H "Content-Type: application/json" -H "kbn-xsrf: anything" \
 
 # *********** Loading dashboards ***************
 for file in ${DIR}/*.json
-do  
+do
     echo "Loading dashboard ${NAME}:"
     curl -XPOST "$KIBANA/api/kibana/dashboards/import" -H 'kbn-xsrf:true' \
     -H 'Content-type:application/json' -d @${file} || exit 1

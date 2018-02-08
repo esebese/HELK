@@ -7,12 +7,12 @@
 # Author: Roberto Rodriguez (@Cyb3rWard0g)
 # License: BSD 3-Clause
 
-# References: 
+# References:
 # https://cyberwardog.blogspot.com/2017/02/setting-up-pentesting-i-mean-threat_98.html
 
 # *********** Check if user is root ***************
 if [[ $EUID -ne 0 ]]; then
-   echo "[HELK-BASH-INSTALLATION-INFO] YOU MUST BE ROOT TO RUN THIS SCRIPT!!!" 
+   echo "[HELK-BASH-INSTALLATION-INFO] YOU MUST BE ROOT TO RUN THIS SCRIPT!!!"
    exit 1
 fi
 
@@ -52,7 +52,7 @@ ERROR=$?
 # *********** Install Prerequisites ***************
 echo "[HELK-BASH-INSTALLATION-INFO] Installing Prerequisites.."
 declare -a prereq_list=("openjdk-8-jre-headless" "curl" "unzip" "python" "python-pip" "apt-transport-https")
-for prereq in ${!prereq_list[@]}; do 
+for prereq in ${!prereq_list[@]}; do
     echo "[HELK-BASH-INSTALLATION-INFO] Installing ${prereq_list[${prereq}]}.."
     apt-get install -y ${prereq_list[${prereq}]} >> $LOGFILE 2>&1
     ERROR=$?
@@ -212,7 +212,7 @@ cp -av ../logstash/pipeline/* ${LS_CONF_PATH} >> $LOGFILE 2>&1
 mv /usr/share/logstash/config/* ${LS_SETTINGS_DIR} >> $LOGFILE 2>&1
 yes | cp -rfv ../logstash/logstash.yml ${LS_SETTINGS_DIR} >> $LOGFILE 2>&1
 echo "[HELK-BASH-INSTALLATION-INFO] Creating templates directory and copying custom templates over.."
-cp -v ../logstash/output_templates/* /opt/helk/output_templates/ >> $LOGFILE 2>&1 
+cp -v ../logstash/output_templates/* /opt/helk/output_templates/ >> $LOGFILE 2>&1
 echo "[HELK-BASH-INSTALLATION-INFO] Creating logstash user and group.."
 groupadd -r logstash -g ${LS_GID}
 useradd -r -s /usr/sbin/nologin -M -c "Logstash user" -u ${LS_UID} -g logstash logstash
@@ -251,13 +251,13 @@ ERROR=$?
     if [ $ERROR -ne 0 ]; then
         echoerror "Could not install kibana (Error Code: $ERROR)."
         exit 1
-    fi    
+    fi
 echo "[HELK-BASH-INSTALLATION-INFO] Adding a htpasswd.users file to nginx.."
 cp -v ../nginx/htpasswd.users /etc/nginx/ >> $LOGFILE 2>&1
 echo "[HELK-BASH-INSTALLATION-INFO] Creating a backup of Nginx's config file.."
-mv /etc/nginx/sites-available/default /etc/nginx/sites-available/backup_default >> $LOGFILE 2>&1   
+mv /etc/nginx/sites-available/default /etc/nginx/sites-available/backup_default >> $LOGFILE 2>&1
 echo "[HELK-BASH-INSTALLATION-INFO] copying custom nginx config file to /etc/nginx/sites-available/.."
-cp -v ../nginx/default /etc/nginx/sites-available/ >> $LOGFILE 2>&1  
+cp -v ../nginx/default /etc/nginx/sites-available/ >> $LOGFILE 2>&1
 echo "[HELK-BASH-INSTALLATION-INFO] testing nginx configuration.."
 nginx -t >> $LOGFILE 2>&1
 echo "[HELK-BASH-INSTALLATION-INFO] Restarting nginx service.."
@@ -341,12 +341,13 @@ echo "[HELK-BASH-INSTALLATION-INFO] Installing Kafka.."
 echo "[HELK-BASH-INSTALLATION-INFO] Setting preferIPv4Stack to True.."
 echo "[HELK-BASH-INSTALLATION-INFO] Downloading Kafka package.."
 wget -qO- http://apache.mirrors.lucidnetworks.net/kafka/1.0.0/kafka_2.11-1.0.0.tgz | sudo tar xvz -C /opt/helk/kafka/ >> $LOGFILE 2>&1
-echo "[HELK-BASH-INSTALLATION-INFO] Creating a backup of default server.properties" 
+echo "[HELK-BASH-INSTALLATION-INFO] Creating a backup of default server.properties"
 mv /opt/helk/kafka/kafka_2.11-1.0.0/config/server.properties /opt/helk/kafka/kafka_2.11-1.0.0/config/backup_server.properties >> $LOGFILE 2>&1
-echo "[HELK-BASH-INSTALLATION-INFO] Copying custom server.properties files" 
+echo "[HELK-BASH-INSTALLATION-INFO] Copying custom server.properties files"
 cp -v ../kafka/*.properties /opt/helk/kafka/kafka_2.11-1.0.0/config/ >> $LOGFILE 2>&1
-echo "[HELK-BASH-INSTALLATION-INFO] Obtaining current host IP.."
-host_ip=$(ip route get 1 | awk '{print $NF;exit}')
+#echo "[HELK-BASH-INSTALLATION-INFO] Obtaining current host IP.."
+#host_ip=$(ip route get 1 | awk '{print $NF;exit}')
+read -p '[HELK-BASH-INSTALLATION-INFO] Enter IP adress to set brokers: ' host_ip # For multiple NIC scenarios
 echo "[HELK-BASH-INSTALLATION-INFO] Setting current host IP to brokers server.properties files.."
 sed -i "s/advertised\.listeners\=PLAINTEXT:\/\/HELKIP\:9092/advertised\.listeners\=PLAINTEXT\:\/\/${host_ip}\:9092/g" /opt/helk/kafka/kafka_2.11-1.0.0/config/server.properties >> $LOGFILE 2>&1
 sed -i "s/advertised\.listeners\=PLAINTEXT:\/\/HELKIP\:9093/advertised\.listeners\=PLAINTEXT\:\/\/${host_ip}\:9093/g" /opt/helk/kafka/kafka_2.11-1.0.0/config/server-1.properties >> $LOGFILE 2>&1
@@ -374,4 +375,3 @@ echo "[HELK-BASH-INSTALLATION-INFO] Adding PySpark environment variables.."
 export PYSPARK_DRIVER_PYTHON=/usr/local/bin/jupyter
 export PYSPARK_DRIVER_PYTHON_OPTS="notebook --NotebookApp.open_browser=False --NotebookApp.ip='*' --NotebookApp.port=8880 --allow-root"
 export PYSPARK_PYTHON=/usr/bin/python
-

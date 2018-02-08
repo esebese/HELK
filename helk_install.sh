@@ -9,7 +9,7 @@
 
 # *********** Check if user is root ***************
 if [[ $EUID -ne 0 ]]; then
-   echo "[HELK-INSTALLATION-INFO] YOU MUST BE ROOT TO RUN THIS SCRIPT!!!" 
+   echo "[HELK-INSTALLATION-INFO] YOU MUST BE ROOT TO RUN THIS SCRIPT!!!"
    exit 1
 fi
 
@@ -66,6 +66,7 @@ two(){
 # *********** Building the HELK from local bash script ***************
 three(){
     echo "[HELK-BASH-INSTALLATION-INFO] Installing the HELK from local bash script"
+    read -p '[HELK-BASH-INSTALLATION-INFO] Set IP adress to access Kibana-Spark-Jupiter Notebook: ' KIBANA_IP # For multiple NIC situation, for now just local bash script installation
     cd scripts/
     ./helk_debian_tar_install.sh
     ERROR=$?
@@ -75,11 +76,11 @@ three(){
     fi
     jupyter_token=" First, run the following: source ~/.bashrc && pyspark"
 }
- 
+
 # *********** Showing HELK Docker menu options ***************
 show_menus() {
     echo " "
-	echo "**********************************************"	
+	echo "**********************************************"
 	echo "**           HELK - M E N U                 **"
     echo "**                                          **"
     echo "** Author: Roberto Rodriguez (@Cyb3rWard0g) **"
@@ -150,7 +151,7 @@ read_options(){
                 ;;
             esac
             echo "[HELK-DOCKER-INSTALLATION-INFO] You're using $lsb_dist version $dist_version"
-            
+
             ERROR=$?
             if [ $ERROR -ne 0 ]; then
                 echoerror "Could not verify distribution or version of the OS (Error Code: $ERROR)."
@@ -218,13 +219,18 @@ read_options(){
 
 # *********** Getting Host IP ***************
 # https://github.com/Invoke-IR/ACE/blob/master/ACE-Docker/start.sh
+if [ $choice = "1" ] || [ $choice = "2" ]; then  # Setting IP for Docker installation
 echo "[HELK-INSTALLATION-INFO] Obtaining current host IP.."
 case "${systemKernel}" in
     Linux*)     host_ip=$(ip route get 1 | awk '{print $NF;exit}');;
     Darwin*)    host_ip=$(ifconfig en0 | grep inet | grep -v inet6 | cut -d ' ' -f2);;
     *)          host_ip="UNKNOWN:${unameOut}"
 esac
+fi
 
+# Setting IP for local bash script installation in multiple NIC case
+if [ $choice = "3" ]; then
+host_ip=$KIBANA_IP
 # *********** Running selected option ***************
 show_menus
 read_options
